@@ -9,7 +9,7 @@ gatk_file <- 'data/gatk.nwk'
 disco_file <- 'data/discosnp.nwk'
 
 gtree <- read.tree(gatk_file)
-pdf('figures/gatk_tree.pdf',8,8)
+pdf('figures/generated/gatk_tree.pdf',8,8)
 
 #Fix labels
 gtree$tip.label = unlist(lapply(gtree$tip.label, FUN=function(x) strsplit(x,'_')[[1]][1]))
@@ -28,12 +28,12 @@ gtree<-rotate(gtree,c('3','1'))
 plot(gtree,type="cladogram",direction="upwards", no.margin = TRUE, cex = 4,,edge.width=5,srt=-90,adj=.5,label.offset=.2)
 dev.off()
 
-# pdf('figures/gatk_tree_rotated.pdf',8,8)
-# plot(gtree,no.margin = TRUE, cex = 2, adj = .5, srt = -90)
-# dev.off()
+pdf('figures/generated/gatk_tree_rightwards.pdf',8,8)
+plot(gtree,type="cladogram",direction="rightwards",no.margin = TRUE, cex = 4,,edge.width=5,srt=-90, adj = .5, label.offset=.2)
+dev.off()
 
 dtree <- read.tree(disco_file)
-pdf('figures/disco_tree.pdf',8,8)
+pdf('figures/generated/disco_tree.pdf',8,8)
 dtree$tip.label = unlist(lapply(dtree$tip.label, FUN=function(x) strsplit(x,'_')[[1]][1]))
 dtree$tip.label = gsub("M2c","M3a",dtree$tip.label) #fix an oopsie
 m <- regexpr("[0-9]+",dtree$tip.label)
@@ -50,13 +50,17 @@ dtree<-rotate(dtree,c('6','8'))
 plot(dtree,type="cladogram",direction="upwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
 dev.off()
 
+pdf('figures/generated/disco_tree_rightwards.pdf',8,8)
+plot(dtree,type="cladogram",direction="rightwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+dev.off()
+
 ttree <- read.tree('data/true_topology.nwk')
 ttree <- rotate(ttree,c('6','7'))
 ttree <- rotate(ttree,c('1','4'))
 ttree <- rotate(ttree,c('1','3'))
 ttree <- rotate(ttree,c('5','6'))
 ttree <- rotate(ttree,c('7','8'))
-pdf('figures/true_tree.pdf',8,8)
+pdf('figures/generated/true_tree.pdf',8,8)
 plot(ttree,type="cladogram",direction="upwards",no.margin=TRUE,cex=4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
 dev.off()
 
