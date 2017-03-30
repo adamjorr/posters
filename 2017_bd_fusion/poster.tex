@@ -67,7 +67,7 @@
 % \item A maximum likelihood tree was constructed with RAxML
 \end{itemize}
 
-\vskip 4ex
+\vskip 2ex
 
 \begin{center}
 	\begin{tikzpicture}[sqnode/.style={rectangle,draw=black!60,fill=black!5,very thick,minimum size=1cm}]
@@ -111,9 +111,11 @@
 % 	\end{block}
 % \end{columns}
 \begin{center}
-\begin{tabu} to .8\linewidth { X[m] X[m] X[m] }
+\begin{tabu} to .92\linewidth { X[-2.5,m] X[c,m] X[c,m] }
   & & True Topology \\
+  & & \\
  GATK & \includegraphics[width=.95\linewidth]{gatk_tree_rightwards.pdf} & \includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf} \\
+  & & \\
  DiscoSNP++ & \includegraphics[width=.95\linewidth]{disco_tree_rightwards.pdf} & \includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf}
 \end{tabu}
 \end{center}

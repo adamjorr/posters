@@ -8,6 +8,16 @@ library('dendextend')
 gatk_file <- 'data/gatk.nwk'
 disco_file <- 'data/discosnp.nwk'
 
+plot_upwards <- function(tree){
+	plot(tree,type="cladogram",direction="upwards",no.margin = TRUE, cex = 4,edge.width=8,srt=180, adj = .5, label.offset=.2)
+}
+
+plot_rightwards <- function(tree){
+	plot(tree,type="cladogram",direction="rightwards",no.margin = TRUE, cex = 4,edge.width=8,srt=0, adj = .5, label.offset=.2)
+}
+
+
+
 gtree <- read.tree(gatk_file)
 pdf('figures/generated/gatk_tree.pdf',8,8)
 
@@ -25,11 +35,13 @@ gtree<-rotate(gtree,c('7','8'))
 gtree<-rotate(gtree,c('1','4'))
 gtree<-rotate(gtree,c('3','1'))
 
-plot(gtree,type="cladogram",direction="upwards", no.margin = TRUE, cex = 4,,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+# plot(gtree,type="cladogram",direction="upwards", no.margin = TRUE, cex = 4,,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+plot_upwards(gtree)
 dev.off()
 
 pdf('figures/generated/gatk_tree_rightwards.pdf',8,8)
-plot(gtree,type="cladogram",direction="rightwards",no.margin = TRUE, cex = 4,,edge.width=5,srt=-90, adj = .5, label.offset=.2)
+# plot(gtree,type="cladogram",direction="rightwards",no.margin = TRUE, cex = 4,,edge.width=5,srt=-90, adj = .5, label.offset=.2)
+plot_rightwards(gtree)
 dev.off()
 
 dtree <- read.tree(disco_file)
@@ -47,11 +59,13 @@ dtree<-rotate(dtree,c('6','8'))
 # dtree <- rotate(dtree,c('7','5'))
 # dtree <- rotate(dtree,c('5','6'))
 # dtree<-rotate(dtree,c('6','7'))
-plot(dtree,type="cladogram",direction="upwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+# plot(dtree,type="cladogram",direction="upwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+plot_upwards(dtree)
 dev.off()
 
 pdf('figures/generated/disco_tree_rightwards.pdf',8,8)
-plot(dtree,type="cladogram",direction="rightwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+# plot(dtree,type="cladogram",direction="rightwards", no.margin = TRUE, cex =4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+plot_rightwards(dtree)
 dev.off()
 
 ttree <- read.tree('data/true_topology.nwk')
@@ -61,7 +75,8 @@ ttree <- rotate(ttree,c('1','3'))
 ttree <- rotate(ttree,c('5','6'))
 ttree <- rotate(ttree,c('7','8'))
 pdf('figures/generated/true_tree.pdf',8,8)
-plot(ttree,type="cladogram",direction="upwards",no.margin=TRUE,cex=4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+# plot(ttree,type="cladogram",direction="upwards",no.margin=TRUE,cex=4,edge.width=5,srt=-90,adj=.5,label.offset=.2)
+plot_upwards(ttree)
 dev.off()
 
 # gtree$edge.length<-NULL
