@@ -199,16 +199,22 @@ Alignment to the consensus sequence produces an alignment with higher overall qu
 \begin{block}{Results: Aligner Choice Affects Generated Reference Quality}
 
 \begin{center}
-	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = -.5cm and 4 cm]
-		\node[cnode] (reads){Reads};
-		\node[cnode] (em1)[above right = of reads]{\textit{E. melliodora} 1 (BWA)};
-		\node[cnode] (em2)[below right = of reads]{\textit{E. melliodora} 1 (NGM)};
-		\node[cnode] (bwaq)[right = 2cm of em1]{Alignment Quality Scores};
-		\node[cnode] (ngmq)[right = 2cm of em2]{Alignment Quality Scores};
-		\draw[line width=3mm,->] (reads.north) |- (em1.west) node[pos=.7,above]{Bowtie};
-		\draw[line width=3mm,->] (reads.south) |- (em2.west) node[pos=.7,below]{Bowtie};
+	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = 2cm and 2cm]
+		\node[cnode] (eg){\textit{E. grandis}};
+		\node[cnode,minimum width=11cm] (reads)[right = of eg]{Reads};
+		\node[cnode] (em1)[above right = 2cm and 4cm of eg]{\textit{E. melliodora} 1};
+		\node[cnode] (em2)[below right = 2cm and 4cm of eg]{\textit{E. melliodora} 1};
+		\node[cnode] (bwaq)[right = 4cm of em1]{Quality Scores};
+		\node[cnode] (ngmq)[right = 4cm of em2]{Quality Scores};
+		\draw[line width=3mm,->] (eg.north) |- (em1);
+		\draw[line width=3mm,->] (eg.south) |- (em2);
+		% \draw[line width=3mm,->] ($(reads.west)+(0cm,.5cm)$) to[out=180,in=180] ($(em1.west)-(1.5cm,0cm)$) -- (em1.west);
+		\draw[line width=3mm,->] ($(reads.west)+(0cm,.5cm)$) -- ++(-1cm,0cm) |- (em1.west) node[pos=.25,right]{BWA};
+		\draw[line width=3mm,->] ($(reads.west)-(0cm,.5cm)$) -- ++(-1cm,0cm) |- (em2.west) node[pos=.25,right]{NGM};
 		\draw[line width=3mm,->] (em1) -- (bwaq);
 		\draw[line width=3mm,->] (em2) -- (ngmq);
+		\draw[line width=3mm,->] ($(reads.east)+(0cm,.5cm)$) -- ++(1cm,0cm) |- (bwaq.west) node[pos=.2,right]{Bowtie};
+		\draw[line width=3mm,->] ($(reads.east)-(0cm,.5cm)$) -- ++(1cm,0cm) |- (ngmq.west) node[pos=.2,right]{Bowtie};
 	\end{tikzpicture}
 \end{center}
 
@@ -244,14 +250,14 @@ A reference created from a NextGenMap alignment produces less unmapped reads tha
 % \begin{center}
 
 \begin{columns}
-\column{.24\linewidth}
-This work is supported by grant NIH R01-HG007178.
-\column{.24\linewidth}
+\column{.4\linewidth}
+This work is supported by grants NIH R01-HG007178 and NSF DBI-1356548.
+\column{.27\linewidth}
 \includegraphics[width=\linewidth]{lab_logo.pdf}
-\column{.24\linewidth}
+\column{.27\linewidth}
 \includegraphics[width=\linewidth]{sols_logo.pdf}
-\column{.2\linewidth}
-\includegraphics[width=\linewidth]{nih-nhgri-official-logo.jpg}
+% \column{.2\linewidth}
+% \includegraphics[width=\linewidth]{nih-nhgri-official-logo.jpg}
 \end{columns}
 
 % \end{center}
