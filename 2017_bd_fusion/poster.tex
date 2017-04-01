@@ -148,14 +148,15 @@ We improve our reference by aligning to the \textit{E. grandis} genome, then cre
 \vskip 1ex
 
 \begin{center}
-	\begin{tikzpicture}[cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = 1 cm]
+	\begin{tikzpicture}[cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = 3 cm]
 		\node[cnode] (reads){Reads};
-		\node[cnode] (eg)[right = of reads]{\textit{E. grandis}};
+		\node[cnode] (eg)[below = .5cm of reads]{\textit{E. grandis}};
 		\node[cnode] (em1)[right = of eg]{\textit{E. melliodora} 1};
 		\node[cnode] (em2)[right = of em1]{\textit{E. melliodora} 2};
 		\node[cnode] (etc)[right = of em2] {...};
-		\draw[line width=3mm,->] (reads.east) -- (eg.west);
-		\draw[line width=3mm,->] (reads.north) -- ++(0cm,1cm) -- ($(em1.north)+(0cm,1cm)$) -| (em1.north);
+		\draw[line width=3mm,->] ($(reads.east)-(0cm,.5cm)$) -- ($(reads.east)+(2cm,-.5cm)$) |- (em1.west);
+		\draw[line width=3mm,->] (reads.east) -- ($(reads.east)+(13cm,0cm)$) |- (em2.west);
+		\draw[line width=3mm,->] ($(reads.east)+(0cm,.5cm)$) -- ($(reads.east)+(24cm,.5cm)$) |- (etc.west);
 		\draw[line width=3mm,->] (eg) -- (em1);
 		\draw[line width=3mm,->] (em1) -- (em2);
 		\draw[line width=3mm,->] (em2) -- (etc);
