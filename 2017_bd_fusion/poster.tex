@@ -169,16 +169,17 @@ We improve our reference by aligning to the \textit{E. grandis} genome, then cre
 \begin{block}{Results: Iterative Mapping Improves Reference}
 
 \begin{center}
-	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = -.5cm and 2.5 cm]
+	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = .5cm and 2.5 cm]
 		\node[cnode] (reads){Reads};
-		\node[cnode] (eg)[above right = of reads]{\textit{E. grandis}};
-		\node[cnode] (em1)[below right = of reads]{\textit{E. melliodora} 1};
-		\node[cnode] (egq)[right = of eg]{Alignment Quality Scores};
+		\node[cnode] (eg)[below = of reads]{\textit{E. grandis}};
+		\node[cnode] (em1)[right = of eg]{\textit{E. melliodora} 1};
 		\node[cnode] (em1q)[right = of em1]{Alignment Quality Scores};
-		\draw[line width=3mm,->] (reads) -- (eg);
-		\draw[line width=3mm,->] (reads) -- (em1);
-		\draw[line width=3mm,->] (eg) -- (egq);
+		\node[cnode] (egq)[below = of em1q]{Alignment Quality Scores};
+		\draw[line width=3mm,->] ($(reads.east)-(0cm,.25cm)$) -- ($(reads.east)+(1.5cm,-.25cm)$) |- (em1.west);
+		\draw[line width=3mm,->] ($(eg.east)+(1.25cm,0cm)$) -- ($(eg.east)+(1.25cm,-1cm)$) |- (egq.west);
+		\draw[line width=3mm,->] (eg) -- (em1);
 		\draw[line width=3mm,->] (em1) -- (em1q);
+		\draw[line width=3mm,->] ($(reads.east)+(0cm,.25cm)$) -- ($(reads.east)+(12.5cm,.25cm)$) |- (em1q.west);
 	\end{tikzpicture}
 \end{center}
 
@@ -229,7 +230,7 @@ Alignment to the consensus sequence produces an alignment with higher overall qu
 
 % \vskip 1ex
 
-A reference created from a NextGenMap alignment produces less unmapped reads than one created from a BWA alignment.
+% A reference created from a NextGenMap alignment produces less unmapped reads than one created from a BWA alignment.
 
 \end{block}
 
