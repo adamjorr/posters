@@ -13,10 +13,19 @@ def illuminabin(q):
 def q_to_p(q):
     return 10.0**-(q/10.0)
 
+def print_table(numbers, filename):
+    with open(filename, 'w') as fh:
+        print(f"Score & Bin & $P(error)$ \\\\", file = fh)
+        print("\\midrule", file = fh)
+        for q in numbers:
+            #if q % 10 == 0:
+               #print(f"\\textbf{{{q}}} & \\textbf{{{illuminabin(q)}}} & \\textbf{{{q_to_p(q):.3f}}} \\\\", file = fh)
+            #else:
+            print(f"{q} & {illuminabin(q)} & {q_to_p(q):.4f} \\\\", file = fh)
+        print("\\bottomrule", file = fh)
+
 def main():
-    print(f"\\bfseries Quality Score & \\bfseries Illumina Bin & \\bfseries $P(error)$ \\\\")
-    print("\\hline")
-    [print(f"\\bfseries {q} & \\bfseries {illuminabin(q)} & \\bfseries {q_to_p(q):4.1} \\\\") if q % 10 == 0 else print(f"{q} & {illuminabin(q)} & {q_to_p(q):4.1} \\\\") for q in list(range(1,21)) + [30,40]]
+    print_table([0,10,20,30,40], 'qtable1.tex')
 
 if __name__ == '__main__':
     main()

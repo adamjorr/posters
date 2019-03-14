@@ -3,15 +3,16 @@
 \usepackage{tikz}
 \usepackage{graphicx}
 \usepackage{tabu}
+\usepackage{xcolor}
 \usetikzlibrary{positioning}
 \usetikzlibrary{calc}
 \usetikzlibrary{backgrounds}
 \usefonttheme{professionalfonts}
 \usetheme{Orr}
-\usepackage[orientation=portrait,width=42in,height=42in,scale=1.4]{beamerposter}
+\usepackage[orientation=portrait, size=custom, width=106.68 ,height=106.68 , scale=1.4]{beamerposter}
 \usepackage{fontawesome}
-\usepackage{xintexpr}
-\usepackage{calculator}
+\usepackage{booktabs}
+
 \graphicspath{{./figures/}{./figures/generated/}{./figures/static/}}
 
 \title{Reference-free Base Quality Score Recalibration for Sensitive Detection of Mutations}
@@ -25,14 +26,16 @@
 \email{\faEnvelopeO \space ajorr1@asu.edu}
 \website{\faLink \space   cartwrig.ht/lab/}
 
+% \setlength{\topsep}{0pt}
+% \setlength{\partopsep}{0pt}
 \begin{document}
 
 \begin{frame}{}
-\begin{columns}
+\begin{columns}[T]
 
 %%%% Left side %%%%
 
-\column{.5\linewidth}
+\begin{column}[T]{.5\linewidth}
 
 %%%%%%%%%%%%%%%%%%%
 
@@ -43,6 +46,8 @@
 
 \begin{block}{Introduction}
 
+\begin{columns}
+\column{.72\linewidth}
 \begin{itemize}
 \item Illumina sequencing reads contain errors
 \item Errors make mutation detection difficult
@@ -53,14 +58,20 @@ P(error) = 10^{\frac{-Q}{10}}
 \begin{displaymath}
 Q = -10\log_{10}{P(error)}
 \end{displaymath}
-\item Though quality scores can be any integer, to reduce the size of data files they are sometimes binned into \textbf{7} bins 
+\item Though quality scores are usually in the range \textbf{0 - 40}, to reduce the size of data files they are sometimes binned %into \textbf{7} bins 
 \end{itemize}
+\column{.25\linewidth}
+\begin{tabular}{l l r} \toprule
+\input{qtable1.tex}
+\end{tabular}
+\end{columns}
 \end{block}
 
-\begin{block}{Base Quality Score Recalibration - BQSR}
+\begin{block}{\textcolor{black}{Methods:} Base Quality Score Recalibration - BQSR}
 Base Quality Score Recalibration is a technique to undo binning \textit{and} improve calibration of the original quality scores.
-However, \textbf{BQSR requires a reference genome and a database of variable sites}. This is done using the \texttt{lighter} software,
-which inspects the kmer spectrum to find erroneous bases rather than comparing the sequence to the reference.
+However, \textbf{BQSR requires a reference genome and a database of variable sites}.
+Our reference-free method uses the \texttt{lighter} software package to find erroneous bases rather than comparing the sequence to a reference.
+\texttt{lighter} inspects the kmer spectrum to find errors and therefore doesn't require a reference.
 
 \begin{figure}
 \begin{center}
@@ -99,10 +110,13 @@ which inspects the kmer spectrum to find erroneous bases rather than comparing t
 
 \end{block}
 
-\begin{block}{Hierarchical Linear Model}
+\begin{block}{\textcolor{black}{Methods:} Hierarchical Linear Model}
 
 The recalibration uses a hierarchical linear model to predict the true probability of error given a set of covariates.
 Each covariate causes the predicted quality score to shift up or down from the predicted score one level above it in the hierarchy.
+
+\begin{columns}
+\column{.475\linewidth}
 
 The relevant covariates are:
 \begin{itemize}
@@ -111,6 +125,8 @@ The relevant covariates are:
 	\item Position in read and whether read is forward or reverse (Cycle)
 	\item Base called and the prior base call (Context)
 \end{itemize}
+
+\column{.475\linewidth}
 
 \begin{figure}
 \begin{center}
@@ -128,212 +144,49 @@ The relevant covariates are:
 \end{tikzpicture}
 \end{center}
 \end{figure}
+\end{columns}
+\end{block}
+%\textbf{Algorithm:} %For each base, record its read group, assigned quality score, cycle, context, and whether or not it was an error.
+%Record the error rate of each read group, then subset each read group by the assigned quality score and calculate the error rate for each subset.
+%Further subset these by 1) cycle and 2) context, and calculate the error rate for each subset.
+\begin{block}{\textcolor{black}{Methods:} Algorithm}
+Subset each base into groups according its covariates.
+Use the mean base quality of the entire dataset as an initial prior. For each level in the hierarchy, the prior is normally distributed around the 
+result of the previous level. Given this prior, find the maximum a posteriori (MAP) error rate and record the difference between the prior and the MAP.
+This is similar to a penalized maximum likelihood. The recalibrated quality is the sum of these differences.
 
-If 
+\vskip 2.2ex
 
 \end{block}
-
-% \begin{block}{Methods: Variant Detection}
-
-% \includegraphics[width=.97\linewidth]{labeled_tree.jpg}
-
-% \vskip 2ex
-
-% \begin{itemize}
-% \item 8 samples collected in triplicate
-% % \item Each replicate was Illumina sequenced
-% % \item Each sequence was aligned to genome of \textit{Eucalyptus grandis} using bwa mem.
-% % \item Variants were called using GATK's UnifiedGenotyper or DiscoSNP++, a reference-free variant caller
-% % \item Nonvariable sites and gaps were removed
-% \item Variants were removed if the genotypes of all replicates of a sample were not identical
-% % \item A maximum likelihood tree was constructed with RAxML
-% \end{itemize}
-
-% \vskip 2ex
-
-% \begin{center}
-% 	\begin{tikzpicture}[align=center, sqnode/.style={rectangle,draw=black!60,fill=black!5,very thick,minimum size=1cm}]
-% 		\node[sqnode] (sequencing) {Sequence};
-% 		\node[sqnode] (filter) [below = 7cm of sequencing] {Filter};
-% 		\node[sqnode] (alignment) [below left = of sequencing] {Alignment};
-% 		\node[sqnode] (gatk) [above left = of filter] {Get Variants (GATK)};
-% 		\node[sqnode] (discosnp) [above right = of filter] {Get Variants (DiscoSNP++)};
-% 		\node[sqnode] (tree) [below = of filter] {Tree Construction};
-% 		\draw[line width=3mm,->] (sequencing) -- (alignment);
-% 		\draw[line width=3mm,->] (sequencing) -- (discosnp);
-% 		\draw[line width=3mm,->] (alignment) -- (gatk);
-% 		\draw[line width=3mm,->] (gatk) -- (filter);
-% 		\draw[line width=3mm,->] (discosnp) -- (filter);
-% 		\draw[line width=3mm,->] (filter) -- (tree);
-% 	\end{tikzpicture}
-% \end{center}
-
-
-% \end{block}
-
-% \begin{block}{Results: Variant Detection}
-
-% \vskip 1ex
-
-% % \begin{columns}
-% % 	\column{.4\linewidth}
-% % 	\begin{block}{GATK}
-% % 	\includegraphics[width=.95\linewidth]{gatk_tree_rightwards.pdf}
-% % 	\end{block}
-% % 	\begin{block}{DiscoSNP++}
-% % 	\includegraphics[width=.95\linewidth]{disco_tree_rightwards.pdf}
-% % 	\end{block}
-% % 	\column{.4\linewidth}
-% % 	\begin{block}{True Topology}
-% % 	\begin{center}
-% % 	\includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf}
-% % 	\vskip 1ex
-% % 	\includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf}
-% % 	\end{center}
-% % 	\end{block}
-% % \end{columns}
-% \begin{center}
-% \begin{tabu} to .92\linewidth { X[-3,m] X[c,m] X[c,m] }
-%   & & True Topology \\
-%   & & \\
-%  GATK & \includegraphics[width=.95\linewidth]{gatk_tree_rightwards.pdf} & \includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf} \\
-%   & & \\
-%  DiscoSNP++ & \includegraphics[width=.95\linewidth]{disco_tree_rightwards.pdf} & \includegraphics[width=.95\linewidth,angle=90]{true_tree.pdf}
-% \end{tabu}
-% \end{center}
-
-% % \vskip 3ex
-
-% % \begin{itemize}
-% % \item The toplogy of the tree built from variants called by reference-free method DiscoSNP++ closely resembles the branching pattern of the plant.
-% % \vskip 1ex
-% % \item DiscoSNP++ performance matches that of GATK used with a reference from the closely-related species \textit{Eucalyptus grandis}.
-% % \vskip 1ex
-% % \item A short internode causes incorrect placement of branches 6, 7, and 8 for both methods.
-% % \end{itemize}
-
-% \end{block}
 
 
 
 % %%% Right Side %%%%
+\end{column}
+\begin{column}[T]{.5\linewidth}
 
-\column{.5\linewidth}
+%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{block}{Quality Score Significance}
-\begin{center}
-\begin{tabular}{ c | c | c }
-\input{qtable.tex}
-\end{tabular}
-\end{center}
+\begin{block}{\textcolor{black}{Methods:} Evaluation}
+\begin{itemize}
+	\item CHM1 and CHM13 are human complete hydatidiform mole cell lines.
+	% \item The moles are formed when a sperm combines with an egg containing no nucleus.
+	% \item The sperm then undergoes mitosis to generate a completely homozygous cell mass.
+	\item DNA from these two lines were mixed to generate a synthetic diploid dataset for benchmarking variant calling algorithms.
+	\item We analyzed a small segment of Illumina sequencing reads aligned on Chromosome 1 and compared recalibrated quality scores generated using our method and the standard GATK method.
+\end{itemize}
 \end{block}
 
-% %%%%%%%%%%%%%%%%%%%
-
-% \begin{block}{Next steps: Reference Improvement}
-
-% We improve our reference by aligning to the \textit{E. grandis} genome, then creating a consensus from that alignment. This can be repeated until convergence.
-
-% \vskip 1ex
-
-% \begin{center}
-% 	\begin{tikzpicture}[cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = 3 cm]
-% 		\node[cnode] (reads){Reads};
-% 		\node[cnode] (eg)[below = .5cm of reads]{\textit{E. grandis}};
-% 		\node[cnode] (em1)[right = of eg]{\textit{E. melliodora} 1};
-% 		\node[cnode] (em2)[right = of em1]{\textit{E. melliodora} 2};
-% 		\node[cnode] (etc)[right = of em2] {...};
-% 		\draw[line width=3mm,->] ($(reads.east)-(0cm,.5cm)$) -- ($(reads.east)+(2cm,-.5cm)$) |- (em1.west);
-% 		\draw[line width=3mm,->] (reads.east) -- ($(reads.east)+(13cm,0cm)$) |- (em2.west);
-% 		\draw[line width=3mm,->] ($(reads.east)+(0cm,.5cm)$) -- ($(reads.east)+(24cm,.5cm)$) |- (etc.west);
-% 		\draw[line width=3mm,->] (eg) -- (em1);
-% 		\draw[line width=3mm,->] (em1) -- (em2);
-% 		\draw[line width=3mm,->] (em2) -- (etc);
-% 	\end{tikzpicture}
-% \end{center}
-
-% \end{block}
-
-
-% \begin{block}{Results: Iterative Mapping Improves Reference}
-
-% \begin{center}
-% 	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = .5cm and 2.5 cm]
-% 		\node[cnode] (reads){Reads};
-% 		\node[cnode] (eg)[below = of reads]{\textit{E. grandis}};
-% 		\node[cnode] (em1)[right = of eg]{\textit{E. melliodora} 1};
-% 		\node[cnode] (em1q)[right = of em1]{Alignment Quality Scores};
-% 		\node[cnode] (egq)[below = of em1q]{Alignment Quality Scores};
-% 		\draw[line width=3mm,->] ($(reads.east)-(0cm,.25cm)$) -- ($(reads.east)+(1.5cm,-.25cm)$) |- (em1.west);
-% 		\draw[line width=3mm,->] ($(eg.east)+(1.25cm,0cm)$) -- ($(eg.east)+(1.25cm,-1cm)$) |- (egq.west);
-% 		\draw[line width=3mm,->] (eg) -- (em1);
-% 		\draw[line width=3mm,->] (em1) -- (em1q);
-% 		\draw[line width=3mm,->] ($(reads.east)+(0cm,.25cm)$) -- ($(reads.east)+(12.5cm,.25cm)$) |- (em1q.west);
-% 	\end{tikzpicture}
-% \end{center}
-
-% \vskip 1ex
-
-% \begin{center}
-
-% \includegraphics[width=.95\linewidth]{both_hist.pdf}
-
-% \end{center}
-
-% % \vskip 1ex
-
-% Alignment to the consensus sequence produces an alignment with higher overall quality scores than alignment to the \textit{Eucalyptus grandis} reference.
-
-% \end{block}
-
-
-% \begin{block}{Results: Aligner Choice Affects Generated Reference Quality}
-
-% \begin{center}
-% 	\begin{tikzpicture}[align=center,cnode/.style={rectangle,draw=black!60,fill=black!5,very thick}, node distance = 2cm and 2cm]
-% 		\node[cnode] (eg){\textit{E. grandis}};
-% 		\node[cnode,minimum width=11cm] (reads)[right = of eg]{Reads};
-% 		\node[cnode] (em1)[above right = 2cm and 4cm of eg]{\textit{E. melliodora} 1};
-% 		\node[cnode] (em2)[below right = 2cm and 4cm of eg]{\textit{E. melliodora} 1};
-% 		\node[cnode] (bwaq)[right = 4cm of em1]{Quality Scores};
-% 		\node[cnode] (ngmq)[right = 4cm of em2]{Quality Scores};
-% 		\draw[line width=3mm,->] (eg.north) |- (em1);
-% 		\draw[line width=3mm,->] (eg.south) |- (em2);
-% 		% \draw[line width=3mm,->] ($(reads.west)+(0cm,.5cm)$) to[out=180,in=180] ($(em1.west)-(1.5cm,0cm)$) -- (em1.west);
-% 		\draw[line width=3mm,->] ($(reads.west)+(0cm,.5cm)$) -- ++(-1cm,0cm) |- (em1.west) node[pos=.25,right]{BWA};
-% 		\draw[line width=3mm,->] ($(reads.west)-(0cm,.5cm)$) -- ++(-1cm,0cm) |- (em2.west) node[pos=.25,right]{NGM};
-% 		\draw[line width=3mm,->] (em1) -- (bwaq);
-% 		\draw[line width=3mm,->] (em2) -- (ngmq);
-% 		\draw[line width=3mm,->] ($(reads.east)+(0cm,.5cm)$) -- ++(1cm,0cm) |- (bwaq.west) node[pos=.2,right]{Bowtie};
-% 		\draw[line width=3mm,->] ($(reads.east)-(0cm,.5cm)$) -- ++(1cm,0cm) |- (ngmq.west) node[pos=.2,right]{Bowtie};
-% 	\end{tikzpicture}
-% \end{center}
-
-% \vskip 1ex
-
-% \begin{center}
-
-% \includegraphics[width=.95\linewidth]{aligner_comparison_hist.pdf}
-
-% \end{center}
-
-% % \vskip 1ex
-
-% % A reference created from a NextGenMap alignment produces less unmapped reads than one created from a BWA alignment.
-
-% \end{block}
-
-
-
-
-% \begin{block}{Conclusions}
-
-% \begin{itemize}
-% 	\item Phylogenies of somatic mutations within a \textit{Eucalyptus} tree match the branching patterns of the tree using both a reference-based and a reference-free variant caller.
-% 	\item Aligning reads to a close relative, obtaining a consensus sequence, then realigning to that consensus seems to improve alignment quality.
-% \end{itemize}
-
-% \end{block}
+\begin{block}{\textcolor{black}{Results:} Similar performance, no reference or variants required}
+\begin{center}
+\includegraphics[width=.9\textwidth]{qualscores.pdf}
+\end{center}
+Both methods improve calibration and resolution, while our method has relaxed input requirements.
+% The numbers in the legend are the Brier scores of each calibration method. The Brier score penalizes incorrect predictions,
+% so a perfect prediction method will have a Brier score of 0. GATK BQSR improves the Brier score by $0.00047$ while our method
+% improves the Brier score by $0.00043$. The peak at Q = 2 is because 2 is a reserved Illumina quality control mark and
+% represents an invalid base.
+\end{block}
 
 \begin{block}{Next Steps}
 \begin{itemize}
@@ -370,6 +223,7 @@ If
 
 \end{block}
 
+\end{column}
 \end{columns}
 \end{frame}
 

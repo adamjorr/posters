@@ -72,8 +72,8 @@
   \leavevmode
 
   \begin{beamercolorbox}[wd=\paperwidth]{headline}
-    \begin{columns}[t]
-      \begin{column}{.03\paperwidth}
+    \begin{columns}[T]
+      \begin{column}[T]{.03\paperwidth}
       \end{column}
 %      \begin{column}{.07\paperwidth}
 %        \begin{center}
@@ -81,8 +81,8 @@
 %        \end{center}
 %        \vskip1ex
 %      \end{column}
-      \begin{column}{.675\paperwidth}
-        \vskip4ex
+      \begin{column}[T]{.675\paperwidth}
+        \vskip2ex
         %\raggedleft
         \usebeamercolor[fg]{title in headline}{\LARGE{\inserttitle}\\}
         \vskip2ex
@@ -90,17 +90,18 @@
         \vskip2ex
         \usebeamercolor[fg]{institute in headline}{\small{\insertinstitute}}
       \end{column}
-      \begin{column}[T]{.25\paperwidth}
+      \begin{column}[T]{.15\paperwidth}
         %Color box behind logo
+        \vskip -2ex
         \begin{beamercolorbox}[wd=\linewidth]{block body}
           \begin{center}
-            \vskip11ex
+            \vskip 9ex
             \inserttitlegraphic
-            \vskip11ex
+            \vskip 9ex
           \end{center}
         \end{beamercolorbox}
       \end{column}
-      \begin{column}{.01\paperwidth}
+      \begin{column}[T]{.01\paperwidth}
       \end{column}
     \end{columns}
   \end{beamercolorbox}
