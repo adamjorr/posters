@@ -1,0 +1,266 @@
+\documentclass{beamer}
+\mode<presentation>
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{tabu}
+\usepackage{xcolor}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{backgrounds}
+\usefonttheme{professionalfonts}
+\usetheme{Orr}
+\usepackage[orientation=portrait, size=custom, width=111.76, height=111.76, scale=1.4]{beamerposter}
+\usepackage{fontawesome}
+\usepackage{booktabs}
+\usepackage[citestyle=authoryear]{biblatex}
+\bibliography{poster}{}
+
+\graphicspath{{./figures/}{./figures/generated/}{./figures/static/}}
+
+\title{KBBQ: A reference-free method for base quality score recalibration}
+\titlegraphic{
+	\includegraphics[width=.95\linewidth]{biodesign_logo.pdf}
+	}
+\date{3/22/19}
+\author{Adam J Orr \inst{1,2} \faTwitter @AdamJOrr, Reed A Cartwright \inst{1,2} \faTwitter @MinionLab}
+\institute{\inst{1} School of Life Sciences, Arizona State University \\
+		   \inst{2} Biodesign Institute, Arizona State University}
+\email{\faEnvelopeO \space ajorr1@asu.edu}
+\website{\faLink \space   cartwrig.ht/lab/}
+
+% \setlength{\topsep}{0pt}
+% \setlength{\partopsep}{0pt}
+\begin{document}
+
+\begin{frame}{}
+\begin{columns}[T]
+
+%%%% Left side %%%%
+
+\begin{column}[T]{.5\linewidth}
+
+%%%%%%%%%%%%%%%%%%%
+
+% KBBQ: A REFERENCE-FREE METHOD FOR BASE QUALITY SCORE
+% RECALIBRATION
+% Adam J Orr1,2, Reed A’ Cartwright1,2
+% 1
+% Arizona State University, School of Life Sciences, Tempe, AZ, 2
+% Arizona
+
+% State University, Biodesign Institute, Tempe, AZ
+% Next-generation DNA sequencing is commonly used to detect genetic
+% variation in many organisms. Quality scores are associated with the
+% sequencing data that predict the accuracy of the base call in each read and
+% statistical models for detecting variants utilize these scores to determine
+% which bases are reliable and which are not. Despite their importance, base
+% quality scores are often poorly calibrated and underestimate the probability
+% of error, causing overconfidence in the accuracy of the resulting variant
+% calls. Base quality score recalibration is a process to increase the accuracy
+% of quality scores, which produces more accurate inferences. However, most
+% methods of base quality score recalibration require a reference genome and
+% database of variable sites, making them difficult to use and less accurate in
+% non-model organisms where the reference may be of poor quality and there
+% is no a priori knowledge of which sites are potentially variable. We present
+% KBBQ, a reference-free method for base quality score recalibration that
+% performs similarly to previous methods but can be used without a reference.
+% KBBQ is MIT-licensed and available at www.github.com/adamjorr/kbbq
+
+
+\begin{block}{Introduction}
+
+\begin{columns}
+\column{.72\linewidth}
+\begin{itemize}
+\item Illumina sequencing reads contain errors
+\item Errors make mutation detection difficult
+\item Quality scores represent $P(error)$ on a phred scale.
+\begin{displaymath}
+P(error) = 10^{\frac{-Q}{10}}
+\end{displaymath}
+\begin{displaymath}
+Q = -10\log_{10}{P(error)}
+\end{displaymath}
+% \item Though quality scores are usually in the range \textbf{0 - 40}, to reduce the size of data files they are sometimes binned %into \textbf{7} bins 
+\item Quality scores are sometimes binned to reduce file size
+\end{itemize}
+\column{.25\linewidth}
+\begin{tabular}{l l r} \toprule
+\input{qtable1.tex}
+\end{tabular}
+\end{columns}
+\end{block}
+
+\begin{block}{\textcolor{black}{Methods:} Base Quality Score Recalibration - BQSR}
+Base Quality Score Recalibration is a technique to improve calibration of the original quality scores.
+However, \textbf{BQSR normally requires a reference genome and a database of variable sites}.
+Our reference-free method uses a method similar to the \texttt{lighter} (\cite{lighter}) error corrector to find erroneous bases rather than comparing the sequence to a reference. You can use your favorite error corrector and use those corrections as input to \texttt{kbbq}.
+
+\begin{columns}
+\column{.6\linewidth}
+\begin{figure}
+\begin{center}
+
+\textbf{GATK BQSR - Reference Required}
+
+\begin{tikzpicture}[framed, align=center, sqnode/.style={rectangle,draw=black!60,fill=black!5,very thick,minimum size=1cm}, node distance = 4 cm]
+	\node[sqnode] (sequencing) {Sequence};
+	\node[sqnode] (alignment) [right = of sequencing] {Alignment};
+	\node[sqnode] (ignorevar) [right = of alignment] {Ignore Variable Sites};
+	\node[sqnode] (lookupref) [below = 2cm of alignment] {Assume Reference Mismatches Are Errors};
+	\node[sqnode] (lnmodel) [below = 2cm of lookupref] {Predict Error Rate with Linear Model};
+	\draw[line width=3mm,->] (sequencing) -- (alignment);
+	\draw[line width=3mm,->] (alignment) -- (ignorevar);
+	\draw[line width=3mm,->] (ignorevar) -- (lookupref);
+	\draw[line width=3mm,->] (lookupref) -- (lnmodel);
+\end{tikzpicture}
+\end{center}
+\end{figure}
+
+\column{.4\linewidth}
+\begin{figure}
+\begin{center}
+
+\textbf{Reference Free BQSR}
+
+\begin{tikzpicture}[framed, align=center, sqnode/.style={rectangle,draw=black!60,fill=black!5,very thick,minimum size=1cm}, node distance = 4 cm]
+	\node[sqnode] (sequencing) {Sequence};
+	\node[sqnode] (kmer) [below = 2cm of sequencing] {Kmer-based Method to Find Errors};
+	\node[sqnode] (lnmodel) [below = 2cm of kmer] {Predict Error Rate with Linear Model};
+	\draw[line width=3mm,->] (sequencing) -- (kmer);
+	\draw[line width=3mm,->] (kmer) -- (lnmodel);
+\end{tikzpicture}
+
+\end{center}
+\end{figure}
+\end{columns}
+\end{block}
+
+\begin{block}{\textcolor{black}{Methods:} Hierarchical Linear Model}
+
+\begin{columns}
+\column{.55\linewidth}
+
+The recalibration uses a hierarchical linear model to predict the true probability of error given a set of covariates.
+Each covariate causes the predicted quality score to shift up or down from the predicted score one level above it in the hierarchy.
+
+\vfill
+
+The relevant covariates are:
+\begin{itemize}
+	\item Read Group
+	\item Original Assigned Quality Score
+	\item Position in read and whether read is forward or reverse (Cycle)
+	\item Base called and the prior base call (Context)
+\end{itemize}
+
+\column{.4\linewidth}
+
+\begin{figure}
+\begin{center}
+
+\textbf{Hierarchical Linear Model}
+
+\begin{tikzpicture}[align=center, sqnode/.style={rectangle,draw=black!60,fill=black!5,very thick,minimum size=1cm}, node distance = 4 cm]
+	\node[sqnode,align=center,above,minimum size=16cm](rg) at (8,0){};
+	% \draw[help lines] (0,0) grid (16,16);
+	\node[](rglab) at (8,15){Read Group};
+	\node[sqnode, align=center,above,minimum size=13cm,fill=gold!10](q) at (8,1){};
+	\node[](qlab) at (8,12){Assigned Quality Score};
+	\node[sqnode, minimum size = 5 cm,fill=maroon!10] at (5,6) {Cycle};
+	\node[sqnode, minimum size = 5 cm,fill=maroon!10] at (11,6) {Context};
+\end{tikzpicture}
+\end{center}
+\end{figure}
+\end{columns}
+\end{block}
+%\textbf{Algorithm:} %For each base, record its read group, assigned quality score, cycle, context, and whether or not it was an error.
+%Record the error rate of each read group, then subset each read group by the assigned quality score and calculate the error rate for each subset.
+%Further subset these by 1) cycle and 2) context, and calculate the error rate for each subset.
+% \begin{block}{\textcolor{black}{Methods:} Algorithm}
+% Subset each base into groups according its covariates.
+% Use the mean base quality of the entire dataset as an initial prior. For each level in the hierarchy, the prior is normally distributed around the 
+% result of the previous level. Given this prior, find the maximum a posteriori (MAP) error rate and record the difference between the prior and the MAP.
+% The recalibrated quality is the sum of these differences.
+
+% % \vskip 2.2ex
+
+% \end{block}
+
+
+\begin{block}{\textcolor{black}{Methods:} Evaluation}
+\begin{itemize}
+	% \item CHM1 and CHM13 are human complete hydatidiform mole cell lines.
+	% \item The moles are formed when a sperm combines with an egg containing no nucleus.
+	% \item The sperm then undergoes mitosis to generate a completely homozygous cell mass.
+	\item DNA from CHM1 and CHM13 human hydatidiform mole cell lines was mixed to generate a synthetic diploid dataset for benchmarking (\cite{li_syndip}).
+	\item We analyzed Illumina reads aligned on Chromosome 1 and compared recalibrated quality scores generated using our method and the standard GATK method.
+\end{itemize}
+\end{block}
+
+
+\begin{block}{Next Steps}
+\begin{itemize}
+	\item Test performance of GATK BQSR with varying levels of false positives.
+	% \item Simulate reads from a distant genome and compare performance with GATK BQSR.
+	\item Linear model improvements
+	\item Programming optimizations.
+\end{itemize}
+\end{block}
+
+
+\begin{block}{Software}
+
+\faicon{github} \url{https://github.com/adamjorr/kbbq}
+
+\end{block}
+
+\begin{block}{Acknowledgements}
+
+% \begin{center}
+
+\begin{columns}
+%\column{.4\linewidth}
+%This work is supported by grants NIH R01-HG007178 and NSF DBI-1356548.
+\column{.27\linewidth}
+\includegraphics[width=\linewidth]{lab_logo.pdf}
+\column{.27\linewidth}
+\includegraphics[width=\linewidth]{sols_logo.pdf}
+\column{.3\linewidth}
+\includegraphics[width=\linewidth]{biodesign_logo.pdf}
+\end{columns}
+
+% \end{center}
+
+\end{block}
+
+% %%% Right Side %%%%
+\end{column}
+\begin{column}[T]{.5\linewidth}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{block}{\textcolor{black}{Results:} GATK BQSR is vulnerable to false negatives in the known sites input.}
+\begin{center}
+\includegraphics[width=.986\textwidth]{fnr.pdf}
+\end{center}
+KBBQ doesn't require \textit{a priori} knowledge of variable sites, so is unaffected by misspecification of known sites.
+\end{block}
+
+\begin{block}{\textcolor{black}{Results:} Similar performance, no reference or variants required}
+\begin{center}
+\includegraphics[width=.986\textwidth]{comparison.pdf}
+\end{center}
+Both methods improve calibration and resolution, while KBBQ has relaxed input requirements.
+% The numbers in the legend are the Brier scores of each calibration method. The Brier score penalizes incorrect predictions,
+% so a perfect prediction method will have a Brier score of 0. GATK BQSR improves the Brier score by $0.00047$ while our method
+% improves the Brier score by $0.00043$. The peak at Q = 2 is because 2 is a reserved Illumina quality control mark and
+% represents an invalid base.
+\end{block}
+
+
+\end{column}
+\end{columns}
+\end{frame}
+
+\end{document}
