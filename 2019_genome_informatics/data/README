@@ -1,0 +1,6 @@
+The numbers data represents the false negative rate of the vcf used to recalibrate.
+The benchmarks are from `kbbq benchmark` which does not trim adaptor sequences.
+The csv's are from GATK's AnalyzeCovarites, comparing the BQSR tables from before and after recalibration. Since during construction of those tables GATK trims adaptors and hard clips soft clipped bases.
+fullgatk.benchmark is the benchmark for the quality in the given BAM.
+
+
